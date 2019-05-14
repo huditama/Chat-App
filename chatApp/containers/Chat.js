@@ -8,7 +8,7 @@ export default class Example extends React.Component {
         messages: []
     };
 
-    componentWillMount() {
+    componentDidMount() {
         firebase
             .auth()
             .onAuthStateChanged((user) => {
@@ -19,8 +19,8 @@ export default class Example extends React.Component {
 
         firestore
             .collection('messages')
-            .get()
-            .then((snapshot) => {
+            .orderBy('createdAt', 'desc')
+            .onSnapshot((snapshot) => {
                 messages = []
                 snapshot.forEach((doc) => {
                     messages.push({
@@ -28,12 +28,9 @@ export default class Example extends React.Component {
                         createdAt: doc.data().createdAt.toDate()
                     })
                 })
-                this.setState(previousState => ({
-                    messages: GiftedChat.append(previousState.messages, messages)
-                }))
-            })
-            .catch((err) => {
-                console.log(err)
+                this.setState({
+                    messages
+                })
             })
     }
 
@@ -41,15 +38,6 @@ export default class Example extends React.Component {
         firestore
             .collection('messages')
             .add(messages[0])
-            .then(() => {
-                console.log('Added new message to firebase!')
-                this.setState(previousState => ({
-                    messages: GiftedChat.append(previousState.messages, messages)
-                }));
-            })
-            .catch((err) => {
-                console.log(err)
-            })
     }
 
     render() {
