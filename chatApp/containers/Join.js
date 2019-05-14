@@ -14,7 +14,8 @@ import {
     Form,
     Item,
     Input,
-    Label
+    Label,
+    Toast
 } from 'native-base';
 import firebase from '../firebaseConfig'
 
@@ -24,19 +25,27 @@ export default class Login extends Component {
     }
 
     handleJoin = () => {
-        firebase
-            .auth()
-            .signInAnonymously()
-            .then(({ user }) => {
-                console.log(user, '=== INI USER SETELAH SIGN IN ANONYMOUS')
+        if (this.state.name === '' || this.state.name === ' ') {
+            Toast.show({
+                text: 'Please input a valid name!',
+                buttonText: 'Okay!'
             })
-            .catch((error) => {
-                // Handle Errors here.
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                console.log(errorMessage)
-                // ...
-            });
+        } else {
+            firebase
+                .auth()
+                .signInAnonymously()
+                .then(({ user }) => {
+                    console.log(user, '=== INI USER SETELAH SIGN IN ANONYMOUS')
+                    this.props.navigation.navigate('Chat', { name: this.state.name })
+                })
+                .catch((error) => {
+                    // Handle Errors here.
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    console.log(errorMessage)
+                    // ...
+                })
+        }
     }
 
     render() {

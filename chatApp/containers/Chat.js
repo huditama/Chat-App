@@ -2,19 +2,28 @@ import React from "react";
 import { GiftedChat } from "react-native-gifted-chat";
 import firebase from '../firebaseConfig'
 import { firestore } from '../firebaseConfig'
+import { Button } from 'react-native'
+import { Header, Right } from 'native-base'
 
 export default class Example extends React.Component {
     state = {
-        messages: []
+        messages: [],
+        userId: ''
     };
 
     componentDidMount() {
         firebase
             .auth()
             .onAuthStateChanged((user) => {
-                this.setState({
-                    userId: user.uid
-                })
+                if (user) {
+                    this.setState({
+                        userId: user.uid
+                    })
+                } else {
+                    this.setState({
+                        userId: ''
+                    })
+                }
             })
 
         firestore
@@ -40,15 +49,45 @@ export default class Example extends React.Component {
             .add(messages[0])
     }
 
+    handleLogout = () => {
+        firebase
+            .auth()
+            .signOut()
+            .then(function () {
+                // Sign-out successful.
+                this.props.navigation.navigate('Join')
+            }).catch(function (error) {
+                // An error happened.
+                console.log(error)
+            });
+    }
+
     render() {
+        let displayName = 'Username...'
+        if (this.props.navigation.state.params.name) {
+            displayName = this.props.navigation.state.params.name
+        }
         return (
-            <GiftedChat
-                messages={this.state.messages}
-                onSend={messages => this.onSend(messages)}
-                user={{
-                    _id: this.state.userId
-                }}
-            />
+            <>
+                <Header >
+                    <Right>
+                        <Button
+                            title='Logout'
+                            onPress={this.handleLogout}
+                        />
+                    </Right>
+                </Header>
+                <GiftedChat
+                    messages={this.state.messages}
+                    onSend={messages => this.onSend(messages)}
+                    renderUsernameOnMessage={true}
+                    isAnimated={true}
+                    user={{
+                        _id: this.state.userId,
+                        name: displayName
+                    }}
+                />
+            </>
         );
     }
 }

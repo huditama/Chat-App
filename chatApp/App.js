@@ -1,5 +1,6 @@
 import React from 'react';
 import Navigation from './Navigation'
+import { Root } from 'native-base'
 import { Font } from 'expo';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -12,10 +13,11 @@ export default class App extends React.Component {
     });
   }
 
-
   render() {
     return (
-      <Navigation />
+      <Root>
+        <Navigation />
+      </Root>
     );
   }
 }
